@@ -1,236 +1,110 @@
-
 <!DOCTYPE html>
 <html>
 <!--
-Copyright 2010 The Closure Library Authors. All Rights Reserved.
-Use of this source code is governed by the Apache License, Version 2.0.
-See the COPYING file for details.
+See https://github.com/google/closure-library/blob/master/closure/goog/demos/toolbar.html
 -->
 <head>
     <title>goog.ui.Toolbar</title>
     <script src="closure-library/closure/goog/base.js"></script>
     <script>
-        goog.require('goog.array');
-        goog.require('goog.debug.DivConsole');
-        goog.require('goog.debug.LogManager');
-        goog.require('goog.dom');
-        goog.require('goog.events');
-        goog.require('goog.events.EventType');
-        goog.require('goog.log');
-        goog.require('goog.object');
-        goog.require('goog.style');
-        goog.require('goog.ui.Button');
-        goog.require('goog.ui.ButtonSide');
-        goog.require('goog.ui.Component.EventType');
-        goog.require('goog.ui.Component.State');
-        goog.require('goog.ui.Menu');
-        goog.require('goog.ui.MenuItem');
-        goog.require('goog.ui.Option');
-        goog.require('goog.ui.SelectionModel');
-        goog.require('goog.ui.Separator');
         goog.require('goog.ui.Toolbar');
         goog.require('goog.ui.ToolbarButton');
-        goog.require('goog.ui.ToolbarMenuButton');
-        goog.require('goog.ui.ToolbarRenderer');
-        goog.require('goog.ui.ToolbarSelect');
         goog.require('goog.ui.ToolbarSeparator');
         goog.require('goog.ui.ToolbarToggleButton');
-        goog.require('goog.dom.TagName');
     </script>
     <link rel="stylesheet" href="closure-library/closure/goog/demos/css/demo.css">
     <link rel="stylesheet" href="closure-library/closure/goog/css/menu.css">
     <link rel="stylesheet" href="closure-library/closure/goog/css/menuitem.css">
     <link rel="stylesheet" href="closure-library/closure/goog/css/menuseparator.css">
     <link rel="stylesheet" href="closure-library/closure/goog/css/toolbar.css">
-    <style>
-        /*
-         * Sample toolbar styles.
-         */
-        /* Base class for all icon elements. */
-        .icon {
-            height: 16px;
-            width: 16px;
-            background-image: url(../images/toolbar_icons.gif);
-            background-repeat: no-repeat;
-            vertical-align: middle;
-        }
-        /* Font select. */
-        .goog-edit-font .goog-toolbar-menu-button-caption {
-            color: #246;
-            width: 15ex;
-            overflow: hidden;
-        }
-        /* Font select options. */
-        .goog-edit-font-normal {
-            font-family: Arial, sans-serif;
-        }
-        .goog-edit-font-times {
-            font-family: Times, serif;
-        }
-        .goog-edit-font-courier {
-            font-family: "Courier New", Courier, monospace;
-        }
-        .goog-edit-font-georgia {
-            font-family: Georgia, serif;
-        }
-        .goog-edit-font-trebuchet {
-            font-family: "Trebuchet MS", sans-serif;
-        }
-        .goog-edit-font-verdana {
-            font-family: Verdana, sans-serif;
-        }
-        /* Font size. */
-        .goog-edit-font-size .goog-toolbar-menu-button-caption {
-            color: #246;
-            width: 5ex;
-        }
-        /* Bold. */
-        .goog-edit-bold {
-            background-position: 0;
-        }
-        /* Italic. */
-        .goog-edit-italic {
-            background-position: -16px;
-        }
-        /* Underline. */
-        .goog-edit-underline {
-            background-position: -32px;
-        }
-        /* Color. */
-        .goog-edit-color {
-            background-position: -48px;
-        }
-        /* Background color. */
-        .goog-edit-background {
-            background-position: -64px;
-        }
-        /* Menu buttons. */
-        .goog-edit-style,
-        .goog-edit-insert,
-        .goog-edit-link,
-        .goog-edit-spellcheck {
-            font-weight: bold;
-            color: #246;
-        }
-        /* Link. */
-        .goog-edit-link {
-            color: #009;
-            text-decoration: underline;
-        }
-        /* Insert menu. */
-        .goog-edit-insert-icon {
-            background-position: -80px;
-            vertical-align: bottom;
-        }
-        .goog-edit-insert-caption {
-            padding: 0 2px;
-            vertical-align: bottom;
-        }
-        /* List style menu. */
-        .goog-edit-list-style {
-            background-position: -96px;
-        }
-        /* Text alignment buttons. */
-        .goog-edit-align-left {
-            background-position: -128px;
-        }
-        .goog-edit-align-center {
-            background-position: -144px;
-        }
-        .goog-edit-align-right {
-            background-position: -160px;
-        }
-        /*
-         * Menu styles, overriding those in menus.css to make these menus a little
-         * more like the CCC editor UI design.
-         */
-        .goog-menu {
-            position: absolute;
-            margin: 0;
-            border-width: 1px;
-            border-style: solid;
-            border-color: #ccc #999 #999 #ccc;
-            padding: 0;
-            font: normal 10pt Arial, sans-serif;
-            color: #000;
-            background-color: #fff;
-            cursor: default;
-            outline: none;
-        }
-        .goog-menuitem {
-            margin: 0;
-            border: 0;
-            padding: 4px 32px 4px 4px;
-            color: #000;
-            background-color: #fff;
-            list-style: none;
-        }
-        .goog-menuitem-disabled {
-            color: #999;
-        }
-        .goog-menuitem-highlight {
-            background-color: #e8eef7 !important;
-        }
-        .goog-menuseparator {
-            position: relative;
-            margin: 2px 0;
-            border-top: 1px solid #999;
-            padding: 0;
-            outline: none;
-        }
-    </style>
 </head>
 <body>
     <div id="toolbar"></div>
-
-
-    <!--<div class="goog-toolbar-toggle-button goog-toolbar-button-checked">-->
-        <!--Toggle Button-->
-    <!--</div>-->
-    <!--<div class="goog-toolbar-toggle-button">-->
-        <!--<div class="icon goog-edit-underline"></div>-->
-    <!--</div>-->
-<br>
 <script>
-    var EVENTS = goog.object.getValues(goog.ui.Component.EventType);
-
     function logEvent(e) {
-        var caption = e.target.getId();
-        if (typeof e.target.getCaption == 'function' && e.target.getCaption()) {
-            caption += ' (' + e.target.getCaption() + ')';
+        var eventType = e.type;
+        if (eventType !== 'action') { // hack
+            return;
         }
-        var state = e.target.getState();
-        //var checked = state & goog.ui.Component.State.CHECKED;
-        var checked = (state & goog.ui.Component.State.CHECKED) ? true : false;
-        console.log('"' + caption + '" dispatched: ' + e.type + ' state: ' + state + ' checked: ' + checked);
+        var eventTargetId = e.target.getId();
+        var eventTargetCaption = null;
+        if (typeof e.target.getCaption == 'function' && e.target.getCaption()) {
+            eventTargetCaption = e.target.getCaption();
+        }
+        var eventTargetState = e.target.getState();
+
+        var activeState = (eventTargetState & goog.ui.Component.State.ACTIVE) ? true : false;
+        var checkedState = (eventTargetState & goog.ui.Component.State.CHECKED) ? true : false;
+        var selectedState = (eventTargetState & goog.ui.Component.State.SELECTED) ? true : false;
+
+        console.log('Event target ID: ' + eventTargetId + ', Caption: ' + eventTargetCaption // + '" eventType: ' + eventType // + ' state: ' + state
+//                + ', Active: ' + activeState
+                + ', Checked: ' + checkedState // this one only makes sense for checkboxes.  We want button press too
+//                + ', Selected: ' + selectedState
+        );
     }
 
     var toolbar = new goog.ui.Toolbar();
-//    toolbar.addChild(new goog.ui.ToolbarButton('Button'), true);
-//    toolbar.getChildAt(0).setTooltip('This is a tooltip for a button');
-//    toolbar.addChild(new goog.ui.ToolbarButton('AnotherButton'), true);
-//    toolbar.addChild(new goog.ui.ToolbarSeparator(), true);
-//    toolbar.addChild(new goog.ui.ToolbarButton('Disabled'), true);
-//    toolbar.getChildAt(3).setEnabled(false);
-//    toolbar.addChild(new goog.ui.ToolbarButton('YetAnotherButton'), true);
+
+    var mtfFilterToggleButton = new goog.ui.ToolbarToggleButton('MTF Filter');
+    mtfFilterToggleButton.setTooltip('MTF Filter');
+    mtfFilterToggleButton.setChecked(false);
+    toolbar.addChild(mtfFilterToggleButton, true);
+
     var spatialFilterToggleButton = new goog.ui.ToolbarToggleButton('Spatial Filter');
+    spatialFilterToggleButton.setTooltip('Create Spatial Filter'); // later change this to "Delete Spatial Filter"
     spatialFilterToggleButton.setChecked(false);
     toolbar.addChild(spatialFilterToggleButton, true);
 
-//    var btnLeft = new goog.ui.ToolbarButton('Left');
-//    btnLeft.setCollapsed(goog.ui.ButtonSide.END);
-//    toolbar.addChild(btnLeft, true);
-//    var btnCenter = new goog.ui.ToolbarButton('Center');
-//    btnCenter.setCollapsed(goog.ui.ButtonSide.END | goog.ui.ButtonSide.START);
-//    toolbar.addChild(btnCenter, true);
-//    var btnRight = new goog.ui.ToolbarButton('Right');
-//    btnRight.setCollapsed(goog.ui.ButtonSide.START);
-//    toolbar.addChild(btnRight, true);
+    var mgrsToggleButton = new goog.ui.ToolbarToggleButton('Append Results');
+    mgrsToggleButton.setChecked(false);
+    mgrsToggleButton.setTooltip('Append Results');
+    toolbar.addChild(mgrsToggleButton, true);
 
-    goog.events.listen(toolbar, EVENTS, logEvent);
+    var appendResultsToggleButton = new goog.ui.ToolbarToggleButton('MGRS');
+    appendResultsToggleButton.setChecked(false);
+    appendResultsToggleButton.setTooltip('Show MGRS Grid');
+    toolbar.addChild(appendResultsToggleButton, true);
+
+    var measureToggleButton = new goog.ui.ToolbarToggleButton('Measure');
+    measureToggleButton.setChecked(false);
+    measureToggleButton.setTooltip('Turn on Measure Tool');
+    toolbar.addChild(measureToggleButton, true);
+
+    toolbar.addChild(new goog.ui.ToolbarSeparator(), true);
+
+    var showDetailsToolbarButton = new goog.ui.ToolbarButton('Show Details');
+    showDetailsToolbarButton.setTooltip('Swap map with details page');
+    toolbar.addChild(showDetailsToolbarButton, true);
+
+    toolbar.addChild(new goog.ui.ToolbarSeparator(), true);
+
+    var clearResultsToolbarButton = new goog.ui.ToolbarButton('Clear Results');
+    clearResultsToolbarButton.setTooltip('Clear Results From Map');
+    toolbar.addChild(clearResultsToolbarButton, true);
+
+    var resetMapToolbarButton = new goog.ui.ToolbarButton('Reset Map');
+    resetMapToolbarButton.setTooltip('Reset Map');
+    toolbar.addChild(resetMapToolbarButton, true);
+
+//    var EVENTS = goog.object.getValues(goog.ui.Component.EventType.ACTION
+//            | goog.ui.Component.EventType.SELECT
+//            | goog.ui.Component.EventType.CHANGE
+//            | goog.ui.Component.EventType.CHECK
+//            | goog.ui.Component.EventType.UNCHECK
+//            | goog.ui.Component.EventType.UNSELECT);
+    var EVENTS = goog.object.getValues(goog.ui.Component.EventType);
+    goog.events.listen(mtfFilterToggleButton, EVENTS, logEvent);
+    //goog.events.listen(spatialFilterToggleButton, goog.ui.Component.EventType.CHANGE |goog.ui.Component.EventType.CHECK | goog.ui.Component.EventType.UNCHECK, logEvent);
+    goog.events.listen(spatialFilterToggleButton, EVENTS, logEvent);
+    goog.events.listen(appendResultsToggleButton, EVENTS, logEvent);
+    goog.events.listen(mgrsToggleButton, EVENTS, logEvent);
+    goog.events.listen(measureToggleButton, EVENTS, logEvent);
+    goog.events.listen(showDetailsToolbarButton, EVENTS, logEvent);
+    goog.events.listen(clearResultsToolbarButton, EVENTS, logEvent);
+    goog.events.listen(resetMapToolbarButton, EVENTS, logEvent);
 
     toolbar.render(goog.dom.getElement('toolbar'));
-    goog.events.listen(toolbar, EVENTS, logEvent);
 </script>
 </body>
 </html>
